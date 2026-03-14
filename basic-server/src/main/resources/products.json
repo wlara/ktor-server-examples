@@ -1,0 +1,34 @@
+[
+  {
+    "id": "217ac10b-58cc-4372-a567-0e02b2c3d411",
+    "name": "Mechanical Keyboard",
+    "description": "RGB backlit with tactile brown switches.",
+    "price": 129.99,
+    "stock": 45,
+    "createdAt": "2026-03-13T08:00:00Z"
+  },
+  {
+    "id": "310e8400-e29b-41d4-a716-446655440022",
+    "name": "Wireless Mouse",
+    "description": "Ergonomic 16k DPI optical sensor.",
+    "price": 59.50,
+    "stock": 120,
+    "createdAt": "2026-03-13T09:15:00Z"
+  },
+  {
+    "id": "b2c3d4e5-f6a7-4890-b1c2-d3e4f5a6b7c8",
+    "name": "Ultra-Wide Monitor",
+    "description": "34-inch curved display, 144Hz refresh rate.",
+    "price": 499.00,
+    "stock": 12,
+    "createdAt": "2026-03-13T10:30:00Z"
+  },
+  {
+    "id": "e1f2a3b4-c5d6-4789-9012-3456789abcde",
+    "name": "USB-C Hub",
+    "description": "7-in-1 adapter with 4K HDMI and Power Delivery.",
+    "price": 35.99,
+    "stock": 250,
+    "createdAt": "2026-03-13T11:00:00Z"
+  }
+]

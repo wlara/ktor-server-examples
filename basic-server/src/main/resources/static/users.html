@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management | Basic Server Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7F52FF;
+            --bg: #f4f7f6;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --card-bg: #ffffff;
+            --danger: #ff7675;
+            --border: #edf2f7;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+        }
+
+        header {
+            background: white;
+            padding: 1rem 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .status-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .dot {
+            height: 8px;
+            width: 8px;
+            background-color: #00b894;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 3px rgba(0, 184, 148, 0.2);
+        }
+
+        .container { max-width: 1100px; margin: 3rem auto; padding: 0 2rem; }
+
+        .page-title { text-align: center; margin-bottom: 3rem; }
+        .page-title h1 { margin-bottom: 0.5rem; font-weight: 700; }
+        .page-title p { color: var(--text-muted); font-weight: 500; margin-top: 0; }
+
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+
+        th {
+            background: #f8f9fa;
+            padding: 1.25rem 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td { padding: 1.25rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+
+        .edit-input {
+            border: 1px solid transparent;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            width: 90%;
+            transition: all 0.2s;
+            background: transparent;
+            color: var(--text-main);
+        }
+
+        .edit-input:hover { background: #f1f2f6; cursor: text; }
+        .edit-input:focus {
+            background: white;
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(127, 82, 255, 0.1);
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover { background: #fff5f5; color: #d63031; }
+
+        .status-msg {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+            min-height: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="/" class="logo">Basic Server Demo</a>
+    <div class="status-container">
+        <span class="dot"></span>
+        <span>API v1 Connected</span>
+    </div>
+</header>
+
+<div class="container">
+    <div class="page-title">
+        <h1>User Management</h1>
+        <p>Powered by Ktor CIO Engine</p>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th style="text-align: center;">Actions</th>
+            </tr>
+            </thead>
+            <tbody id="user-table-body"></tbody>
+        </table>
+    </div>
+    <div id="status-msg" class="status-msg"></div>
+</div>
+
+<script>
+    const statusMsg = document.getElementById('status-msg');
+
+    function showStatus(text, isError = false) {
+        statusMsg.innerText = text;
+        statusMsg.style.color = isError ? '#ff7675' : '#00b894';
+        setTimeout(() => statusMsg.innerText = '', 3000);
+    }
+
+    async function loadUsers() {
+        const body = document.getElementById('user-table-body');
+        try {
+            const response = await fetch('/api/v1/users');
+            const users = await response.json();
+
+            body.innerHTML = users.map(user => `
+                <tr id="row-${user.id}">
+                    <td style="font-weight: 600; color: var(--text-muted)">#${user.id}</td>
+                    <td>
+                        <input class="edit-input"
+                               value="${user.name}"
+                               onchange="updateUserField('${user.id}', 'name', this.value, this)">
+                    </td>
+                    <td>
+                        <input class="edit-input"
+                               value="${user.email}"
+                               onchange="updateUserField('${user.id}', 'email', this.value, this)">
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn-delete" onclick="deleteUser('${user.id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (e) {
+            body.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 3rem; color: var(--danger)">Unable to load data.</td></tr>`;
+        }
+    }
+
+    async function updateUserField(id, field, newValue, element) {
+        // Validation: Check email format if that's the field we're updating
+        if (field === 'email') {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(newValue)) {
+                element.style.border = '1px solid var(--danger)';
+                showStatus("Invalid email format", true);
+                return;
+            }
+        }
+
+        // Reset border if validation passes
+        element.style.border = '1px solid transparent';
+
+        try {
+            const payload = {};
+            payload[field] = newValue;
+
+            const response = await fetch(`/api/v1/users/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if(response.ok) {
+                showStatus(`User ${field} updated successfully`);
+            } else {
+                showStatus("Server error during update", true);
+            }
+        } catch (e) {
+            showStatus("Network error", true);
+        }
+    }
+
+    async function deleteUser(id) {
+        if(!confirm("Are you sure?")) return;
+        try {
+            const response = await fetch(`/api/v1/users/${id}`, { method: 'DELETE' });
+            if(response.ok) {
+                const row = document.getElementById(`row-${id}`);
+                row.style.opacity = '0.3';
+                setTimeout(() => {
+                    row.remove();
+                    showStatus("User record deleted");
+                }, 200);
+            }
+        } catch (e) {
+            showStatus("Delete failed", true);
+        }
+    }
+
+    loadUsers();
+</script>
+</body>
+</html>

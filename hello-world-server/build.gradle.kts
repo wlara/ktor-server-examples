@@ -15,6 +15,7 @@ kotlin {
 }
 
 dependencies {
+    implementation(platform(libs.ktor.bom))
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.cio)
     implementation(libs.logback.classic)

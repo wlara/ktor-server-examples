@@ -1,37 +1,24 @@
 package io.github.wlara.ktor.server.examples.basic.plugins
 
+import io.github.wlara.ktor.server.examples.basic.core.exceptions.HttpStatusException
 import io.github.wlara.ktor.server.examples.basic.core.extensions.deepestCause
-import io.github.wlara.ktor.server.examples.basic.core.extensions.error
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.install
-import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.NotFoundException
+import io.ktor.server.application.log
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respond
-import org.koin.core.parameter.parametersOf
-import org.koin.ktor.ext.inject
-import org.slf4j.Logger
 
 fun Application.configureStatusPages() {
-    val logger: Logger by inject { parametersOf(this::class) }
-
     install(StatusPages) {
 
-        exception<NotFoundException> { call, cause ->
-            call.respondError(HttpStatusCode.NotFound, cause)
+        exception<HttpStatusException> { call, cause ->
+            call.respondError(cause.statusCode, cause)
         }
 
-        exception<IllegalStateException> { call, cause ->
-            call.respondError(HttpStatusCode.Conflict, cause)
-        }
-
-        exception<BadRequestException> { call, cause ->
-            call.respondError(HttpStatusCode.BadRequest, cause)
-        }
         exception<Throwable> { call, cause ->
-            logger.error(cause) { "InternalServerError" }
+            this@configureStatusPages.log.error("InternalServerError", cause)
             call.respondError(HttpStatusCode.InternalServerError, cause)
         }
     }

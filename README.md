@@ -72,4 +72,4 @@ Build artifacts are generated under each module's `build/libs` directory.
 
 ## License
 
-See `LICENSE`.
+See [LICENSE](LICENSE).
